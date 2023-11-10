@@ -47,8 +47,16 @@ public:
 
   void setSpeed(uint8_t speed);
 
+  bool paused();
+
+  void pause();
+  void unpause();
+
   bool finished();
 private:
+  bool m_Paused = false;
+  bool m_WasPaused = false;
+
   int m_Back  = 0;
   int m_Front = 0;
 

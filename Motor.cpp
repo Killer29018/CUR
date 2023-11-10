@@ -55,6 +55,19 @@ void Motor::addMove(Direction direction, uint8_t cells)
 
 void Motor::update()
 {
+  static int S_CACHED_TIME = 0;
+  if (m_Paused)
+  {
+    if (!empty())
+    {
+      S_CACHED_TIME = head().startTime - millis();
+    }
+    stopMotors();
+    m_Initial = true;
+
+    return;
+  }
+
   if (empty())
   {
     m_Finished = true;
@@ -72,8 +85,15 @@ void Motor::update()
 
     moveMotors(head().direction);
 
+    if (m_WasPaused)
+    {
+      head().runTime = head().runTime - S_CACHED_TIME;
+      m_WasPaused = false;
+    }
+
     return;
   }
+
 
   Motor::Move& current = head();
   uint64_t duration = millis() - current.startTime;
@@ -95,6 +115,19 @@ void Motor::update()
 void Motor::setSpeed(uint8_t speed)
 {
   m_Speed = speed;
+}
+
+bool Motor::paused() { return m_Paused; }
+
+void Motor::pause()
+{
+  m_Paused = true;
+}
+
+void Motor::unpause()
+{
+  m_Paused = false;
+  m_WasPaused = true;
 }
 
 bool Motor::finished()
